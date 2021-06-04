@@ -1,0 +1,361 @@
+---
+title: "Divvy_Bikes_Case_Study"
+author: "Bugra Kanmaz"
+date: "02/06/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+#### This analysis is for case study 1 from the Google Data Analytics Certificate 
+#### The data covers  May 2020 - April 2021.
+
+#### The aim of this analysis is to find "How do annual members and casual riders use Divvy bikes differently?"
+
+#### And appropriate 3 marketing strategies will be recommended to stakeholders
+
+### STEP 0: Installing the Necessary Packages
+```{r library}
+library(tidyverse)
+library(dplyr)
+library(lubridate)
+library(readxl)
+library(readr)
+library(ggplot2)#helps visualize data
+```
+
+### STEP 1: COLLECT DATA
+##### Importing data
+```{r data}
+May_2020 <- read_csv("/Users/lenovo/Documents/2_Training/1_Data/0_Data_Analysis/Google_Certificate/8_Capstone_Project/Case_Study_1/0_Data/Raw/12_Month_Data/202005-divvy-tripdata.csv")
+Jun_2020 <- read_csv("/Users/lenovo/Documents/2_Training/1_Data/0_Data_Analysis/Google_Certificate/8_Capstone_Project/Case_Study_1/0_Data/Raw/12_Month_Data/202006-divvy-tripdata.csv")
+Jul_2020 <- read_csv("/Users/lenovo/Documents/2_Training/1_Data/0_Data_Analysis/Google_Certificate/8_Capstone_Project/Case_Study_1/0_Data/Raw/12_Month_Data/202007-divvy-tripdata.csv")
+Aug_2020 <- read_csv("/Users/lenovo/Documents/2_Training/1_Data/0_Data_Analysis/Google_Certificate/8_Capstone_Project/Case_Study_1/0_Data/Raw/12_Month_Data/202008-divvy-tripdata.csv")
+Sep_2020 <- read_csv("/Users/lenovo/Documents/2_Training/1_Data/0_Data_Analysis/Google_Certificate/8_Capstone_Project/Case_Study_1/0_Data/Raw/12_Month_Data/202009-divvy-tripdata.csv")
+Oct_2020 <- read_csv("/Users/lenovo/Documents/2_Training/1_Data/0_Data_Analysis/Google_Certificate/8_Capstone_Project/Case_Study_1/0_Data/Raw/12_Month_Data/202010-divvy-tripdata.csv")
+Nov_2020 <- read_csv("/Users/lenovo/Documents/2_Training/1_Data/0_Data_Analysis/Google_Certificate/8_Capstone_Project/Case_Study_1/0_Data/Raw/12_Month_Data/202011-divvy-tripdata.csv")
+Dec_2020 <- read_csv("/Users/lenovo/Documents/2_Training/1_Data/0_Data_Analysis/Google_Certificate/8_Capstone_Project/Case_Study_1/0_Data/Raw/12_Month_Data/202012-divvy-tripdata.csv")
+Jan_2021 <- read_csv("/Users/lenovo/Documents/2_Training/1_Data/0_Data_Analysis/Google_Certificate/8_Capstone_Project/Case_Study_1/0_Data/Raw/12_Month_Data/202101-divvy-tripdata.csv")
+Feb_2021 <- read_csv("/Users/lenovo/Documents/2_Training/1_Data/0_Data_Analysis/Google_Certificate/8_Capstone_Project/Case_Study_1/0_Data/Raw/12_Month_Data/202102-divvy-tripdata.csv")
+Mar_2021 <- read_csv("/Users/lenovo/Documents/2_Training/1_Data/0_Data_Analysis/Google_Certificate/8_Capstone_Project/Case_Study_1/0_Data/Raw/12_Month_Data/202103-divvy-tripdata.csv")
+Apr_2021 <- read_csv("/Users/lenovo/Documents/2_Training/1_Data/0_Data_Analysis/Google_Certificate/8_Capstone_Project/Case_Study_1/0_Data/Raw/12_Month_Data/202104-divvy-tripdata.csv")
+
+```
+
+### STEP 2: WRANGLE DATA AND COMBINE INTO A SINGLE FILE
+
+##### Checking table columns for consistency
+```{r colnames}
+colnames(May_2020)
+colnames(Jun_2020)
+colnames(Jul_2020)
+colnames(Aug_2020)
+colnames(Sep_2020)
+colnames(Oct_2020)
+colnames(Nov_2020)
+colnames(Dec_2020)
+colnames(Jan_2021)
+colnames(Feb_2021)
+colnames(Mar_2021)
+colnames(Apr_2021)
+```
+
+##### Inspect of data for field attributes.
+
+```{r structure_table}
+str(May_2020)
+str(Jun_2020)
+str(Jul_2020)
+str(Aug_2020)
+str(Sep_2020)
+str(Oct_2020)
+str(Nov_2020)
+str(Dec_2020)
+str(Jan_2021)
+str(Feb_2021)
+str(Mar_2021)
+str(Apr_2021)
+```
+
+##### start_id columns is imported "double" in some tables!
+
+##### Converting Character type of start_station_id / end_station_id columns to correct format.
+
+```{r mutate_1}
+tibble(May_2020)
+May_2020 <-  mutate(May_2020, start_station_id = as.character(start_station_id))
+Jun_2020 <-  mutate(Jun_2020, start_station_id = as.character(start_station_id))
+Jul_2020 <-  mutate(Jul_2020, start_station_id = as.character(start_station_id))
+Aug_2020 <-  mutate(Aug_2020, start_station_id = as.character(start_station_id))
+Sep_2020 <-  mutate(Sep_2020, start_station_id = as.character(start_station_id))
+Oct_2020 <-  mutate(Oct_2020, start_station_id = as.character(start_station_id))
+Nov_2020 <-  mutate(Nov_2020, start_station_id = as.character(start_station_id))
+May_2020 <-  mutate(May_2020, end_station_id = as.character(end_station_id))
+Jun_2020 <-  mutate(Jun_2020, end_station_id = as.character(end_station_id))
+Jul_2020 <-  mutate(Jul_2020, end_station_id = as.character(end_station_id))
+Aug_2020 <-  mutate(Aug_2020, end_station_id = as.character(end_station_id))
+Sep_2020 <-  mutate(Sep_2020, end_station_id = as.character(end_station_id))
+Oct_2020 <-  mutate(Oct_2020, end_station_id = as.character(end_station_id))
+Nov_2020 <-  mutate(Nov_2020, end_station_id = as.character(end_station_id))
+```
+
+
+##### Merging data and analysing the structure of merged data
+
+```{r merge_1}
+Merged_Ride <- bind_rows(May_2020,Jun_2020,Jul_2020,Aug_2020,Sep_2020,Oct_2020,Nov_2020,Dec_2020,Jan_2021,Feb_2021,Mar_2021,Apr_2021)
+
+str(Merged_Ride)
+
+```
+
+##### Remove lat, long, fields  in Merged table since we will not use in our business task
+
+```{r merge_2}
+Merged_Ride <- Merged_Ride %>% 
+  select(-c(start_lat,start_lng,end_lat,end_lng))
+```
+
+### STEP 3: CLEAN UP AND ADD DATA TO PREPARE FOR ANALYSIS
+
+##### Checking the Merged table 
+
+```{r structure_merge}
+colnames(Merged_Ride) 
+nrow(Merged_Ride) # number of rows
+dim(Merged_Ride)
+str(Merged_Ride)
+summary(Merged_Ride)
+```
+
+##### There are a few problems we will need to fix:
+##### (1) The data can only be aggregated at the ride-level, which is too granular.
+#####  We will want to add some additional columns of data -- such as day, month, year -- that provide additional ##### opportunities to aggregate the data.
+##### (2) We will want to add a calculated field for length of ride.
+##### We will add "ride_length" to the entire dataframe for consistency.
+##### (3) There are some rides where tripduration shows up as negative, 
+##### including several hundred rides where Divvy took bikes out of circulation for Quality Control reasons.
+##### We will want to delete these rides.
+
+
+
+##### Creating day of week and date columns (1)
+
+```{r date_cols}
+Merged_Ride$date <- as.Date(Merged_Ride$started_at,format = "%d/%m/%y") #default format does not work here 
+Merged_Ride$month <- format(as.Date(Merged_Ride$date),"%m")
+Merged_Ride$day <- format(as.Date(Merged_Ride$date),"%d")
+Merged_Ride$year <- format(as.Date(Merged_Ride$date),"%Y")
+Merged_Ride$day_of_week <- format(as.Date(Merged_Ride$date),"%A")
+```
+
+
+##### Converting char columns started_at/ended_at to date from char
+
+```{r date_cols_2}
+Merged_Ride$started_at <- strptime(Merged_Ride$started_at,format= "%d/%m/%Y %H:%M")
+Merged_Ride$ended_at <- strptime(Merged_Ride$ended_at,format= "%d/%m/%Y %H:%M")
+```
+
+##### Adding calculated ride_length column (2)
+
+```{r ride_length}
+Merged_Ride$ride_length <- difftime(Merged_Ride$ended_at,Merged_Ride$started_at)
+
+is.factor(Merged_Ride$ride_length) 
+Merged_Ride$ride_length <- as.numeric(as.character(Merged_Ride$ride_length))
+is.numeric(Merged_Ride$ride_length) #Convert ride_length column to numeric
+
+Merged_Ride$ride_length <- Merged_Ride$ride_length/60 #converting ride_length to mins from secs
+
+```
+
+##### Remove "bad" data (3)
+##### The merged table includes a few hundred entries when bikes were taken out of docks and checked for quality by Divvy or ride_length was negative
+##### We will create a new version of the dataframe (v2) since data is being removed
+
+```{r data_v2}
+Merged_Ride_v2 <- Merged_Ride[!(Merged_Ride$ride_length <=0 ),]
+```
+
+### STEP 4: CONDUCT DESCRIPTIVE ANALYSIS
+
+##### Analyzing the merged data in terms of date, bike type and station name. 
+
+##### Comparing members and casual users since business task asks us how members and casual riders use bikes differently
+```{r aggregates_1}
+
+aggregate(Merged_Ride_v2$ride_length ~ Merged_Ride_v2$member_casual, FUN = mean)
+aggregate(Merged_Ride_v2$ride_length ~ Merged_Ride_v2$member_casual, FUN = median)
+aggregate(Merged_Ride_v2$ride_length ~ Merged_Ride_v2$member_casual, FUN = max)
+aggregate(Merged_Ride_v2$ride_length ~ Merged_Ride_v2$member_casual, FUN = min)
+```
+
+
+#### Daily Analysis
+
+```{r avg_1}
+aggregate(Merged_Ride_v2$ride_length ~ Merged_Ride_v2$member_casual + Merged_Ride_v2$day_of_week, FUN = mean)
+# See the average ride time by each day for members vs casual users
+```
+
+
+##### Notice that the days of the week are out of order. Let's fix that.
+```{r day_order}
+Merged_Ride_v2$day_of_week <- ordered(Merged_Ride_v2$day_of_week, levels=c("Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"))
+```
+
+```{r avg_2}
+aggregate(Merged_Ride_v2$ride_length ~ Merged_Ride_v2$member_casual + Merged_Ride_v2$day_of_week, FUN = mean)
+# Now, let's run the average ride time by each day for members vs casual users
+```
+
+
+```{r weekday}
+
+# analyze ridership data by type and weekday
+
+Merged_Ride_v2 %>% 
+  mutate(weekday = wday(started_at, label = TRUE)) %>%  #creates weekday field using wday()
+  group_by(member_casual, weekday) %>%  #groups by usertype and weekday
+  summarise(number_of_rides = n()							#calculates the number of rides and average duration 
+            ,average_duration = mean(ride_length)) %>% 		# calculates the average duration
+  arrange(member_casual, weekday)								# sorts
+
+```
+
+#### Monthly Analysis
+
+```{r month_order}
+
+#Firstly assign the correct order to each month of year
+
+Merged_Ride_v2$month <- ordered(Merged_Ride_v2$month, levels= c('January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'))
+
+
+```
+
+```{r avg_3}
+#Average ride length for customer type per month
+
+Merged_Ride_v2 %>%
+  mutate(month = month(started_at,label = TRUE)) %>% 
+  group_by(member_casual,month) %>% 
+  summarise(average_duration= mean(ride_length),.groups = "drop") %>% 
+  arrange(month)
+```
+
+```{r month_1}
+#number of rides for customer type per month
+
+Merged_Ride_v2 %>%
+  mutate(month = month(started_at,label = TRUE)) %>% 
+  group_by(member_casual,month) %>% 
+  summarise(number_of_ride= n(),.groups = "drop") %>% 
+  arrange(month)
+
+```
+
+#### Bike Type Analysis
+
+```{r bike_type}
+#The rides for each bike type
+
+Merged_Ride_v2 %>%
+  group_by(rideable_type,member_casual) %>% 
+  summarise(number_of_ride= n(),.groups = "drop")
+
+```
+
+
+#### Station Analysis for Casual Customers
+
+```{r station}
+
+#Most 20 popular stations for casual riders
+
+Merged_Ride_v2 %>%
+  group_by(start_station_name,member_casual) %>% 
+  summarise(number_of_ride= n(),.groups = "drop") %>%
+  filter(start_station_name !="",member_casual != "member") %>% 
+  arrange(-number_of_ride) %>% 
+  head(n=20)
+```
+
+
+### STEP 5: Visualize the Data
+
+##### Plotting the graphs to see the various trends.
+
+```{r Rider_Types, warning=FALSE,echo=TRUE}
+# Graph of Number of Rides by Rider Types (Customer)
+
+Merged_Ride_v2 %>% 
+  mutate(weekday=wday(started_at,label = TRUE)) %>% 
+  group_by(member_casual,weekday) %>% 
+  summarise(number_of_rides=n(),average_duration=mean(ride_length)) %>% 
+  arrange(member_casual,weekday) %>% 
+  ggplot(aes(x=weekday,y=number_of_rides,fill=member_casual))+geom_col(position = "dodge")
+```
+
+```{r Avg_Ride, warning=FALSE,echo=TRUE}
+# Graph of Average Duration for Customer types
+
+Merged_Ride_v2 %>% 
+  mutate(weekday=wday(started_at,label = TRUE)) %>% 
+  group_by(member_casual,weekday) %>% 
+  summarise(number_of_rides=n(),average_duration=mean(ride_length)) %>% 
+  arrange(member_casual,weekday) %>% 
+  ggplot(aes(x=weekday,y=average_duration,fill=member_casual))+geom_col(position = "dodge")
+
+```
+
+```{r Avg_Ride_1, warning=FALSE,echo=TRUE}
+
+#Graph of casual rider's average duration of ride for each month 
+
+Merged_Ride_v2 %>% 
+  mutate(month=month(started_at,label = TRUE)) %>% 
+  group_by(member_casual,month) %>% 
+  summarise(average_duration=mean(ride_length),.groups = "drop") %>% 
+  filter(member_casual =="casual") %>% 
+  ggplot(aes(x=month,y=average_duration,fill=member_casual))+geom_bar(position = "dodge",stat = "identity")+
+  theme(axis.text.x = element_text(angle=35))
+
+```
+
+```{r num_Ride_m, warning=FALSE,echo=TRUE}
+
+#Graph of casual rider's number of ride for each month 
+
+Merged_Ride_v2 %>% 
+  mutate(month=month(started_at,label = TRUE)) %>% 
+  group_by(member_casual,month) %>% 
+  summarise(number_of_rides=n(),.groups = "drop") %>% 
+  filter(member_casual =="casual") %>% 
+  ggplot(aes(x=month,y=number_of_rides,fill=member_casual))+geom_bar(position = "dodge",stat = "identity")+
+  theme(axis.text.x = element_text(angle=35))
+
+```
+
+```{r num_Ride_hr, warning=FALSE,echo=TRUE}
+
+#Graph of casual rider's number of ride for each hour of the day
+
+Merged_Ride_v2 %>% 
+  mutate(hr_of_day=hour(round_date(started_at, unit ="hour"))) %>% 
+  group_by(member_casual,hr_of_day) %>% 
+  summarise(number_of_rides=n(),.groups = "drop") %>% 
+  filter(member_casual =="casual") %>% 
+  ggplot(aes(x=hr_of_day,y=number_of_rides,fill=member_casual))+geom_bar(position = "dodge",stat = "identity")+
+  scale_x_continuous(breaks=c(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23))
+```
+
+### Three Recommendations for Marketing Strategies
+
+####	1.Run a weekend discount program that gives casual riders x% off on their next ride if they ride over **40** minutes *(This discount can only be used for weekdays to encourage casual riders to ride during weekdays)*
+####	2. Run a limited discount program on annual membership during peak months from **May - August**
+####	3. Run an hourly low-cost ride campaign for peak hours that is between **13:00-19:00** for member customers to attract casual customers for membership. 
